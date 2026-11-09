@@ -1,0 +1,47 @@
+
+name: Crear APK Mi Tabata
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  crear-apk:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: MiTabata_GitHub_Gratis
+
+    steps:
+      - name: Descargar proyecto
+        uses: actions/checkout@v4
+
+      - name: Preparar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Preparar Android
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar Android SDK
+        run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Preparar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Compilar APK
+        run: gradle --no-daemon assembleDebug
+
+      - name: Guardar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: MiTabata-APK-Android
+          path: MiTabata_GitHub_Gratis/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
